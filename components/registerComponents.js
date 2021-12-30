@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import axios from 'axios';
 
 const RegisterComponent = () => {
-  const router = useRouter();
+  
   const [userData, setUserData] = useState({
     username: '',
     email: '',
@@ -14,7 +14,7 @@ const RegisterComponent = () => {
     e.preventDefault();
     try {
       await axios.post('/api/register', userData);
-      router.replace('/profile');
+      Router.replace('/profile');
     } catch (err) {
       console.log(err.response.data);
     }
