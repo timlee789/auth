@@ -1,18 +1,25 @@
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import nookies from 'nookies';
-import LoginComponent from '../components/loginComponent';
 
-const Home = () => {
+const Profile = (props) => {
   const router = useRouter();
-  const goToRegister = () => {
-    router.push('/register');
+  const { user: { email, username } } = props;
+
+  const logout = async () => {
+    try {
+      await axios.get('/api/logout');
+      router.push('/');
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return (
     <div>
-      <LoginComponent />
-      <button onClick={goToRegister}>Register</button>
+      <div>Username: {username}</div>
+      <div>Email: {email}</div>
+      <button onClick={logout}>Logout</button>
     </div>
   )
 }
@@ -23,7 +30,7 @@ export const getServerSideProps = async (ctx) => {
 
   if (cookies?.jwt) {
     try {
-      const { data } = await axios.get('http://localhost:1337/api/users/kyu', {
+      const { data } = await axios.get('http://localhost:1337/api/users/me', {
         headers: {
           Authorization:
             `Bearer ${cookies.jwt}`,
@@ -35,18 +42,20 @@ export const getServerSideProps = async (ctx) => {
     }
   }
 
-  if (user) {
+  if (!user) {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile'
+        destination: '/'
       }
     }
   }
 
   return {
-    props: {}
+    props: {
+      user
+    }
   }
 }
 
-export default Home;
+export default Profile;
